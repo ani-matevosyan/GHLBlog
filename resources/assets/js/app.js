@@ -8,9 +8,14 @@
 require('./bootstrap');
 import VueRouter from 'vue-router';
 import router from './routes.js';
+import auth from './auth.js';
+
 
 window.Vue = require('vue');
+window.auth = auth;
 Vue.use(VueRouter);
+
+window.Event = new Vue;
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

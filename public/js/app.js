@@ -3713,6 +3713,7 @@ module.exports = __webpack_require__(59);
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__routes_js__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__auth_js__ = __webpack_require__(70);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -3724,8 +3725,12 @@ __webpack_require__(13);
 
 
 
+
 window.Vue = __webpack_require__(50);
+window.auth = __WEBPACK_IMPORTED_MODULE_2__auth_js__["a" /* default */];
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]);
+
+window.Event = new Vue();
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -34829,8 +34834,55 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            username: '',
+            password: ''
+        };
+    },
+
+
+    methods: {
+        login: function login() {
+            var _this = this;
+
+            var data = {
+                username: this.username,
+                password: this.password
+            };
+
+            axios.post('/api/login', data).then(function (_ref) {
+                var data = _ref.data;
+
+                auth.login(data.token, data.user);
+
+                _this.$router.push('/dashboard');
+            }).catch(function (_ref2) {
+                var response = _ref2.response;
+
+                alert(response.data.message);
+            });
+        }
+    }
+});
 
 /***/ }),
 /* 46 */
@@ -34840,7 +34892,61 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Login")])
+  return _c("div", [
+    _c("h1", [_vm._v("Login")]),
+    _vm._v(" "),
+    _c("p", [
+      _c("label", { attrs: { for: "username" } }, [_vm._v("Email")]),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.username,
+            expression: "username"
+          }
+        ],
+        attrs: { type: "text", name: "username", id: "username" },
+        domProps: { value: _vm.username },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.username = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("p", [
+      _c("label", { attrs: { for: "password" } }, [_vm._v("Password")]),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.password,
+            expression: "password"
+          }
+        ],
+        attrs: { type: "password", name: "password", id: "password" },
+        domProps: { value: _vm.password },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.password = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("button", { on: { click: _vm.login } }, [_vm._v("Login")])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -46351,8 +46457,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            authenticated: auth.check(),
+            user: auth.user
+        };
+    },
+    mounted: function mounted() {
+        var _this = this;
+
+        Event.$on('userLoggedIn', function () {
+            _this.authenticated = true;
+            _this.user = auth.user;
+        });
+        Event.$on('userLoggedOut', function () {
+            _this.authenticated = false;
+            _this.user = auth.user;
+        });
+    },
+
+    methods: {
+        logout: function logout() {
+            auth.logout();
+        }
+    }
+});
 
 /***/ }),
 /* 58 */
@@ -46379,7 +46516,30 @@ var render = function() {
     _vm._v(" "),
     _c(
       "div",
-      [_c("router-link", { attrs: { to: "/login" } }, [_vm._v("Login")])],
+      [
+        _vm.authenticated && _vm.user
+          ? _c(
+              "div",
+              [
+                _c("p", [_vm._v("Hello, " + _vm._s(_vm.user.name))]),
+                _vm._v(" "),
+                _c(
+                  "router-link",
+                  {
+                    attrs: { to: "/login" },
+                    nativeOn: {
+                      click: function($event) {
+                        return _vm.logout($event)
+                      }
+                    }
+                  },
+                  [_vm._v("Logout")]
+                )
+              ],
+              1
+            )
+          : _c("router-link", { attrs: { to: "/login" } }, [_vm._v("Login")])
+      ],
       1
     ),
     _vm._v(" "),
@@ -46401,6 +46561,78 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Auth = function () {
+    function Auth() {
+        _classCallCheck(this, Auth);
+
+        this.token = null;
+        this.user = null;
+    }
+
+    _createClass(Auth, [{
+        key: 'login',
+        value: function login(token, user) {
+            window.localStorage.setItem('token', token);
+            window.localStorage.setItem('user', JSON.stringify(user));
+
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+
+            this.token = token;
+            this.user = user;
+
+            Event.$emit('userLoggedIn');
+        }
+    }, {
+        key: 'logout',
+        value: function logout(token, user) {
+            var _this = this;
+
+            axios.post('/api/logout').then(function (_ref) {
+                var data = _ref.data;
+
+                window.localStorage.setItem('token', null);
+                window.localStorage.setItem('user', null);
+                axios.defaults.headers.common['Authorization'] = '';
+                _this.token = null;
+                _this.user = null;
+                Event.$emit('userLoggedOut');
+            }).catch(function (_ref2) {
+                var response = _ref2.response;
+
+                alert(response.data.message);
+            });
+        }
+    }, {
+        key: 'check',
+        value: function check() {
+            return !!this.token;
+        }
+    }]);
+
+    return Auth;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (new Auth());
 
 /***/ })
 /******/ ]);

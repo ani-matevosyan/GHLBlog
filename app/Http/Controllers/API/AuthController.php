@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -26,10 +27,25 @@ class AuthController extends Controller
 
     /**
      * Login a user.
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return JSON
      */
     public function login()
     {
+        $user = User::whereEmail(request('username'))->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Wrong email, no user with given email',
+                'status' => 422
+            ], 422);
+        }
+        if (!Hash::check(request('password'), $user->password)) {
+            return response()->json([
+                'message' => 'Wrong password, specified password does not belong to this user',
+                'status' => 422
+            ], 422);
+        }
+
         $data = [
             'grant_type' => 'password',
             'client_id' => '2',
@@ -39,7 +55,21 @@ class AuthController extends Controller
         ];
 
         $request = Request::create('/oauth/token', 'POST', $data);
-        return app()->handle($request);
+        $response = app()->handle($request);
+
+        if ($response->getStatusCode() != 200) {
+            return response()->json([
+                'message' => 'Wrong email or password',
+                'status' => 422
+            ], 422);
+        }
+
+        $data = json_decode($response->getContent());
+        return response()->json([
+            'token' => $data->access_token,
+            'user' => $user,
+            'status' => 200
+        ]);
     }
 
     /**
