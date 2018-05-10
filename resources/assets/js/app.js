@@ -8,11 +8,12 @@
 require('./bootstrap');
 import VueRouter from 'vue-router';
 import router from './routes.js';
-import auth from './auth.js';
+
+import Auth from './auth.js';
 
 
 window.Vue = require('vue');
-window.auth = auth;
+window.auth = new Auth();
 Vue.use(VueRouter);
 
 window.Event = new Vue;

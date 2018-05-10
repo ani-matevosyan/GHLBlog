@@ -1,7 +1,12 @@
 class Auth {
     constructor() {
-        this.token = null;
-        this.user = null;
+        this.token = window.localStorage.getItem('token');
+        let userData = window.localStorage.getItem('user');
+        this.user = userData ? JSON.parse(userData) : null;
+
+        if (this.token) {
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
+        }
     }
 
     login (token, user) {
@@ -36,4 +41,4 @@ class Auth {
     }
 }
 
-export default new Auth();
+export default Auth;

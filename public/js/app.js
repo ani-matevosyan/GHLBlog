@@ -3726,8 +3726,9 @@ __webpack_require__(13);
 
 
 
+
 window.Vue = __webpack_require__(50);
-window.auth = __WEBPACK_IMPORTED_MODULE_2__auth_js__["a" /* default */];
+window.auth = new __WEBPACK_IMPORTED_MODULE_2__auth_js__["a" /* default */]();
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]);
 
 window.Event = new Vue();
@@ -34610,12 +34611,32 @@ var routes = [{
     component: __webpack_require__(44)
 }, {
     path: '/dashboard',
-    component: __webpack_require__(47)
+    component: __webpack_require__(47),
+    meta: { middlewareAuth: true }
 }];
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
+var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
     routes: routes
-}));
+});
+
+router.beforeEach(function (to, from, next) {
+    if (to.matched.some(function (record) {
+        return record.meta.middlewareAuth;
+    })) {
+        if (!auth.check()) {
+            next({
+                path: '/login',
+                query: { redirect: to.fullPath }
+            });
+
+            return;
+        }
+    }
+
+    next();
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (router);
 
 /***/ }),
 /* 38 */
@@ -46585,8 +46606,13 @@ var Auth = function () {
     function Auth() {
         _classCallCheck(this, Auth);
 
-        this.token = null;
-        this.user = null;
+        this.token = window.localStorage.getItem('token');
+        var userData = window.localStorage.getItem('user');
+        this.user = userData ? JSON.parse(userData) : null;
+
+        if (this.token) {
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
+        }
     }
 
     _createClass(Auth, [{
@@ -46632,7 +46658,7 @@ var Auth = function () {
     return Auth;
 }();
 
-/* harmony default export */ __webpack_exports__["a"] = (new Auth());
+/* harmony default export */ __webpack_exports__["a"] = (Auth);
 
 /***/ })
 /******/ ]);
